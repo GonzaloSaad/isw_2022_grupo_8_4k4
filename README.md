@@ -37,10 +37,10 @@ isw_2022_grupo_8_4k4
 | Guia De Trabajos Prácticos Resueltos           | `guia_trabajos_practicos_resueltos_<XX>.pdf` | `/material_de_catedra/practico`             |
 | Material Bibliográfico                         | `material_bibliografico_<titulo>.pdf`        | `/bibliografi`                              |
 
-| Sigla    | Significado                                 |
-|----------|---------------------------------------------|
-| <XX>     | Número cardinal comenzando en 01            |
-| <titulo> | Cadena de caracteres en estilo `snake_case` |
+| Sigla      | Significado                                 |
+|------------|---------------------------------------------|
+| `<XX>`     | Número cardinal comenzando en 01            |
+| `<titulo>` | Cadena de caracteres en estilo `snake_case` |
 
 
 ### Definición De Generación de Linea Base
