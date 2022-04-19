@@ -5,20 +5,20 @@
 ```
 isw_2022_grupo_8_4k4
 │
-├─── trabajos_practicos
-│       ├─── evaluable
-│       │       └─── tp_<xx>
-│       │
-│       ├─── no_evaluable
-│       │       └─── tp_<xx>
-│       │
-│       └─── resolucion_ejercicios
+├─── bibliografia
 │
 ├─── material_de_catedra
 │       ├─── teorico
 │       └─── practico
 │
-└─── bibliografia
+└─── trabajos_practicos
+        ├─── evaluable
+        │       └─── tp_<xx>
+        │
+        ├─── no_evaluable
+        │       └─── tp_<xx>
+        │
+        └─── resolucion_ejercicios
 
 ```
 
@@ -35,7 +35,7 @@ isw_2022_grupo_8_4k4
 | Presentaciones de Clase                        | `presentacion_teorico_<XX>_<titulo>.pdf`     | `/material_de_catedra/teorico`              |
 | Guia De Trabajos Prácticos                     | `guia_trabajos_practicos_<XX>.pdf`           | `/material_de_catedra/practico`             |
 | Guia De Trabajos Prácticos Resueltos           | `guia_trabajos_practicos_resueltos_<XX>.pdf` | `/material_de_catedra/practico`             |
-| Material Bibliográfico                         | `material_bibliografico_<titulo>.pdf`        | `/bibliografi`                              |
+| Material Bibliográfico                         | `material_bibliografico_<XX>_<titulo>.pdf`   | `/bibliografi`                              |
 
 | Sigla      | Significado                                 |
 |------------|---------------------------------------------|
