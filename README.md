@@ -45,4 +45,5 @@ isw_2022_grupo_8_4k4
 
 ### Definición De Generación de Linea Base
 
-Se generará una linea base cada vez que se obtenga una calificacion de un trabajo práctico evaluable.
+Se generará una linea base cada vez que se obtenga una calificacion de un trabajo práctico evaluable. 
+El titulo de la linea base sera `Linea Base <XX>` y su tag de git sera `<XX>` donde `<XX>` es el número de la linea base.
