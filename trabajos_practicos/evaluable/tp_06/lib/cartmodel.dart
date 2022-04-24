@@ -6,6 +6,7 @@ class CartModel extends Model {
 
   int get total => cart.length;
 
+
   void addProduct(product) {
     int index = cart.indexWhere((i) => i.id == product.id);
     if (index != -1) {
@@ -45,6 +46,22 @@ class CartModel extends Model {
     cart.forEach((f) {
       totalCartValue += f.price * f.qty;
     });
+  }
+
+  double cartTotal() {
+    double total = 0;
+    for (var f in cart) {
+      total += f.price * f.qty;
+    }
+    return total;
+  }
+
+  double cartTotalWithShipping() {
+    double subtotal = 0;
+    for (var f in cart) {
+      subtotal += f.price * f.qty;
+    }
+    return subtotal + 100;
   }
 }
 

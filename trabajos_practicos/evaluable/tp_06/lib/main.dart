@@ -3,6 +3,7 @@ import 'package:scoped_model/scoped_model.dart';
 
 import 'cartmodel.dart';
 import 'cartpage.dart';
+import 'checkout.dart';
 import 'home.dart';
 
 void main() => runApp(Grabeat());
@@ -16,7 +17,10 @@ class Grabeat extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Grabeat',
         home: HomePage(),
-        routes: {'/cart': (context) => CartPage()},
+        routes: {
+          '/cart': (context) => CartPage(),
+          '/checkout': (context) => CheckoutPage(),
+        },
       ),
     );
   }

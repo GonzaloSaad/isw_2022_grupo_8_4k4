@@ -112,8 +112,8 @@ class _CartPageState extends State<CartPage> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        child: const Text("Comprar"),
-        onPressed: () {}, // TODO: Add checkout action!
+        child: const Text("Realizar Pedido"),
+        onPressed: () => Navigator.pushNamed(context, '/checkout'),
       ),
     );
   }
