@@ -36,6 +36,8 @@ class _CheckoutFormState extends State<_CheckoutForm> {
         child: Column(
           children: <Widget>[
             _buildOrderDetail(),
+            const Text("Domicilio"),
+            Location(),
             //const Divider(color: Colors.black),
             AddressInformation(),
             //const Divider(color: Colors.black),
@@ -78,20 +80,62 @@ class _CheckoutFormState extends State<_CheckoutForm> {
 Address
 */
 
-class AddressInformation extends StatelessWidget {
+
+
+class Location extends StatefulWidget {
+  const Location({Key? key}) : super(key: key);
+
+  @override
+  State<Location> createState() => _SelectLocation();
+}
+
+class _SelectLocation extends State<Location> {
+  String dropdownValue = 'Córdoba';
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      icon: const Icon(Icons.arrow_drop_down),
+      elevation: 0,
+      style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          dropdownValue = newValue!;
+        });
+      },
+      items: <String>['Córdoba', 'Villa Allende', 'La Calera']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+}
+
+
+class AddressInformation extends StatelessWidget{
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         children: [
-          const Text("Domicilio"),
           _buildStreetNameTextField(context),
           _buildStreetNumberTextField(),
         ],
       ),
     );
   }
+
+
 
   TextFormField _buildStreetNameTextField(BuildContext context) {
     return TextFormField(
