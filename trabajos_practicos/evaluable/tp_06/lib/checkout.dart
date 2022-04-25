@@ -366,6 +366,17 @@ class _ShipmentMomentState extends State<ShipmentMoment> {
   Widget _buildHourRangeInput() {
     var formattedRange = "${_selectedRange.startTime.format(context)} "
         "y ${_selectedRange.endTime.format(context)}";
+
+    TimeRange? disabledTime;
+
+    if (isToday(_selectedDate)) {
+      disabledTime = TimeRange(
+          startTime: TimeOfDay.now().replacing(hour: 3, minute: 0),
+          endTime: TimeOfDay.now());
+    } else {
+      disabledTime = null;
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -381,6 +392,8 @@ class _ShipmentMomentState extends State<ShipmentMoment> {
               onPressed: () async {
                 TimeRange range = await showTimeRangePicker(
                   context: context,
+                  disabledTime: disabledTime,
+                  labels: _getLabels(),
                 );
                 setState(() {
                   _selectedRange = range;
@@ -389,5 +402,33 @@ class _ShipmentMomentState extends State<ShipmentMoment> {
         )
       ],
     );
+  }
+
+  List<ClockLabel> _getLabels() {
+    var labels = [
+      "12 am",
+      "3 am",
+      "6 am",
+      "9 am",
+      "12 pm",
+      "3 pm",
+      "6 pm",
+      "9 pm"
+    ];
+    return labels.asMap().entries.map((e) {
+      return ClockLabel.fromIndex(idx: e.key, length: 8, text: e.value);
+    }).toList();
+  }
+
+  bool isToday(DateTime dateTime) {
+    DateTime now = DateTime.now();
+
+    DateTime nowToCompare = DateTime(now.year, now.month, now.day);
+    DateTime dateTimeToCompare = DateTime(
+      dateTime.year,
+      dateTime.month,
+      dateTime.day,
+    );
+    return dateTimeToCompare.difference(nowToCompare).inDays == 0;
   }
 }
