@@ -11,7 +11,6 @@ class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.indigo,
         title: const Text("Realizar Pedido"),
       ),
       body: _CheckoutForm(),
@@ -35,25 +34,15 @@ class _CheckoutFormState extends State<_CheckoutForm> {
         key: _formKey,
         child: Column(
           children: <Widget>[
-            _buildOrderDetail(),
-            const Text("Domicilio"),
-            Location(),
-            //const Divider(color: Colors.black),
+            OrderDetail(),
             AddressInformation(),
-            //const Divider(color: Colors.black),
             PaymentMethod(),
-            //const Divider(color: Colors.black),
             ShipmentMoment(),
             _buildConfirmButton(),
           ],
         ),
       ),
     );
-  }
-
-  Widget _buildOrderDetail() {
-    CartModel cart = ScopedModel.of<CartModel>(context);
-    return Container();
   }
 
   Widget _buildConfirmButton() {
@@ -64,7 +53,7 @@ class _CheckoutFormState extends State<_CheckoutForm> {
           if (_formKey.currentState!.validate()) {
             CartModel cart = ScopedModel.of<CartModel>(context);
             cart.clearCart();
-            Navigator.pop(context);
+            Navigator.pushReplacementNamed(context, "/home");
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Pedido Enviado')),
             );
@@ -77,50 +66,50 @@ class _CheckoutFormState extends State<_CheckoutForm> {
 }
 
 /*
-Address
+Order Detail
 */
-
-
-
-class Location extends StatefulWidget {
-  const Location({Key? key}) : super(key: key);
-
-  @override
-  State<Location> createState() => _SelectLocation();
-}
-
-class _SelectLocation extends State<Location> {
-  String dropdownValue = 'Córdoba';
-
+class OrderDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return DropdownButton<String>(
-      value: dropdownValue,
-      icon: const Icon(Icons.arrow_drop_down),
-      elevation: 0,
-      style: const TextStyle(color: Colors.deepPurple),
-      underline: Container(
-        height: 2,
-        color: Colors.deepPurpleAccent,
+    CartModel cart = ScopedModel.of<CartModel>(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(
+        children: [
+          const Text("Detalle Del Pedido"),
+          Column(
+            children: [
+              ListTile(
+                title: const Text("Subtotal:"),
+                trailing: Text("\$ ${cart.cartTotal()}.00"),
+              ),
+              const ListTile(
+                title: Text("Envio:"),
+                trailing: Text("\$ 100.00"),
+              ),
+              ListTile(
+                title: const Text("Total:"),
+                trailing: Text("\$ ${cart.cartTotalWithShipping()}.00"),
+              ),
+            ],
+          ),
+        ],
       ),
-      onChanged: (String? newValue) {
-        setState(() {
-          dropdownValue = newValue!;
-        });
-      },
-      items: <String>['Córdoba', 'Villa Allende', 'La Calera']
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
     );
   }
 }
 
+/*
+Address
+*/
 
-class AddressInformation extends StatelessWidget{
+class AddressInformation extends StatefulWidget {
+  @override
+  State<AddressInformation> createState() => _AddressInformationState();
+}
+
+class _AddressInformationState extends State<AddressInformation> {
+  String dropdownValue = 'Córdoba';
 
   @override
   Widget build(BuildContext context) {
@@ -128,14 +117,18 @@ class AddressInformation extends StatelessWidget{
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         children: [
+          const Text("Domicilio"),
           _buildStreetNameTextField(context),
-          _buildStreetNumberTextField(),
+          Row(
+            children: [
+              Expanded(child: _buildDropdownButton()),
+              Expanded(child: _buildStreetNumberTextField()),
+            ],
+          ),
         ],
       ),
     );
   }
-
-
 
   TextFormField _buildStreetNameTextField(BuildContext context) {
     return TextFormField(
@@ -176,6 +169,31 @@ class AddressInformation extends StatelessWidget{
         }
         return null;
       },
+    );
+  }
+
+  DropdownButton<String> _buildDropdownButton() {
+    return DropdownButton<String>(
+      value: dropdownValue,
+      icon: const Icon(Icons.arrow_drop_down),
+      elevation: 0,
+      //style: const TextStyle(color: Colors.deepPurple),
+      underline: Container(
+        height: 2,
+        //color: Colors.deepPurpleAccent,
+      ),
+      onChanged: (String? newValue) {
+        setState(() {
+          dropdownValue = newValue!;
+        });
+      },
+      items: <String>['Córdoba', 'Villa Allende', 'La Calera']
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
     );
   }
 }
@@ -268,7 +286,8 @@ class _PaymentMethodState extends State<PaymentMethod> {
             return "Ingrese un monto no vacío.";
           }
 
-          double enteredValue = double.parse(value.replaceAll("\$", ""));
+          String cleanedValue = value.replaceAll("\$", "").replaceAll(",", "");
+          double enteredValue = double.parse(cleanedValue);
 
           if (enteredValue <= 0) {
             return "Ingrese un monto positivo mayor a 0.";
@@ -299,15 +318,16 @@ class _ShipmentMomentState extends State<ShipmentMoment> {
   final _dateFormat = DateFormat("dd/MM/yyyy");
   late DateTime _selectedDate;
   late TimeRange _selectedRange;
+  final TimeRange _initialTimeRange = TimeRange(
+      startTime: TimeOfDay.now(),
+      endTime: TimeOfDay.now().replacing(
+        hour: TimeOfDay.now().hour + 1,
+      ));
 
   @override
   void initState() {
     _selectedDate = DateTime.now();
-    _selectedRange = TimeRange(
-        startTime: TimeOfDay.now(),
-        endTime: TimeOfDay.now().replacing(
-          hour: TimeOfDay.now().hour + 1,
-        ));
+    _selectedRange = _initialTimeRange;
     super.initState();
   }
 

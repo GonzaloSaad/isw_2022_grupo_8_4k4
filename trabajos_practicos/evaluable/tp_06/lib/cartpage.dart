@@ -15,13 +15,11 @@ class _CartPageState extends State<CartPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.indigo,
         title: const Text("Carrito"),
         actions: <Widget>[
           TextButton(
               child: const Text(
                 "Limpiar",
-                style: TextStyle(color: Colors.white),
               ),
               onPressed: () => ScopedModel.of<CartModel>(context).clearCart())
         ],

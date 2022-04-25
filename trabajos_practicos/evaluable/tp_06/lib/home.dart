@@ -20,21 +20,21 @@ final List<Product> _products = [
   ),
   Product(
     id: 3,
-    title: "Orange",
+    title: "Naranja",
     price: 20.0,
     imgUrl: "https://img.icons8.com/cotton/2x/orange.png",
     qty: 1,
   ),
   Product(
     id: 4,
-    title: "Melon",
+    title: "Sandía",
     price: 40.0,
     imgUrl: "https://img.icons8.com/cotton/2x/watermelon.png",
     qty: 1,
   ),
   Product(
     id: 5,
-    title: "Avocado",
+    title: "Palta",
     price: 25.0,
     imgUrl: "https://img.icons8.com/cotton/2x/avocado.png",
     qty: 1,
@@ -45,7 +45,6 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.indigo[50],
       appBar: _buildAppBar(),
       body: buildBody(),
     );
@@ -53,7 +52,6 @@ class HomePage extends StatelessWidget {
 
   AppBar _buildAppBar() {
     return AppBar(
-      backgroundColor: Colors.indigo,
       title: const Text("Home"),
       actions: <Widget>[
         ScopedModelDescendant<CartModel>(
@@ -109,7 +107,7 @@ class HomePage extends StatelessWidget {
           ),
           Text("\$${product.price}"),
           OutlinedButton(
-            child: const Text("Add"),
+            child: const Text("Agregar"),
             onPressed: onAdd,
           )
         ],
