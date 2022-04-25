@@ -1,5 +1,4 @@
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -157,8 +156,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
       child: Column(
         children: [
           const Text("Forma De Pago"),
-          _buildCashOption(),
-          _buildVISAOption(),
+          Row(
+            children: [
+              Expanded(child: _buildCashOption()),
+              Expanded(child: _buildVISAOption())
+            ],
+          ),
           _buildPaymentInput(),
         ],
       ),
@@ -250,12 +253,19 @@ class ShipmentMoment extends StatefulWidget {
 class _ShipmentMomentState extends State<ShipmentMoment> {
   ShipmentMoments? _shipmentMoments = ShipmentMoments.asap;
   final _dateFormat = DateFormat("dd/MM/yyyy");
-  final DateTime _selectedDate = DateTime.now();
-  final TimeRange _selectedRange = TimeRange(
-      startTime: TimeOfDay.now(),
-      endTime: TimeOfDay.now().replacing(
-        hour: TimeOfDay.now().hour + 1,
-      ));
+  late DateTime _selectedDate;
+  late TimeRange _selectedRange;
+
+  @override
+  void initState() {
+    _selectedDate = DateTime.now();
+    _selectedRange = TimeRange(
+        startTime: TimeOfDay.now(),
+        endTime: TimeOfDay.now().replacing(
+          hour: TimeOfDay.now().hour + 1,
+        ));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -264,8 +274,12 @@ class _ShipmentMomentState extends State<ShipmentMoment> {
       child: Column(
         children: [
           const Text("Envío"),
-          _buildASAPOption(),
-          _buildSelectedOption(),
+          Row(
+            children: [
+              Expanded(child: _buildASAPOption()),
+              Expanded(child: _buildSelectedOption())
+            ],
+          ),
           _buildShipmentInput(),
         ],
       ),
@@ -313,49 +327,108 @@ class _ShipmentMomentState extends State<ShipmentMoment> {
     return Column(
       children: <Widget>[
         // const Text('Ingresá la fecha'),
-        _showSelectedDate(),
-        _buildHourRangeInput()
+        _buildDateInput(),
+        _buildHourRangeInput(),
       ],
-    );
-  }
-
-  Widget _showSelectedDate() {
-    String formattedDate = _dateFormat.format(_selectedDate);
-    return Text(
-      "Entregar el pedido el día $formattedDate "
-      "entre ${_selectedRange.startTime.format(context)} "
-      "y ${_selectedRange.endTime.format(context)}",
     );
   }
 
   Widget _buildDateInput() {
     String formattedDate = _dateFormat.format(_selectedDate);
-    return Text("Entregar el pedido el día $formattedDate");
-    return DateTimeField(
-      format: _dateFormat,
-      onShowPicker: (context, currentValue) async {
-        final date = await showDatePicker(
-          context: context,
-          firstDate: DateTime.now(),
-          initialDate: currentValue ?? DateTime.now(),
-          lastDate: DateTime.now().add(const Duration(days: 7)),
-        );
-        return date;
-      },
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Expanded(
+          child: Text("Fecha de Entrega"),
+        ),
+        Expanded(
+          child: Text(formattedDate),
+        ),
+        Expanded(
+          child: TextButton(
+              child: const Text("Cambiar Fecha"),
+              onPressed: () async {
+                var date = await showDatePicker(
+                  context: context,
+                  firstDate: DateTime.now(),
+                  initialDate: _selectedDate,
+                  lastDate: DateTime.now().add(const Duration(days: 7)),
+                );
+                setState(() {
+                  _selectedDate = date ?? DateTime.now();
+                });
+              }),
+        )
+      ],
     );
   }
 
   Widget _buildHourRangeInput() {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () async {
-          TimeRange result = await showTimeRangePicker(
-            context: context,
-          );
-          print("result " + result.toString());
-        },
-        child: const Text("Elegir Rango"),
-      ),
+    var formattedRange = "${_selectedRange.startTime.format(context)} "
+        "y ${_selectedRange.endTime.format(context)}";
+
+    TimeRange? disabledTime;
+
+    if (isToday(_selectedDate)) {
+      disabledTime = TimeRange(
+          startTime: TimeOfDay.now().replacing(hour: 3, minute: 0),
+          endTime: TimeOfDay.now());
+    } else {
+      disabledTime = null;
+    }
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Expanded(
+          child: Text("Hora de Entrega"),
+        ),
+        Expanded(
+          child: Text(formattedRange),
+        ),
+        Expanded(
+          child: TextButton(
+              child: const Text("Cambiar Rango"),
+              onPressed: () async {
+                TimeRange range = await showTimeRangePicker(
+                  context: context,
+                  disabledTime: disabledTime,
+                  labels: _getLabels(),
+                );
+                setState(() {
+                  _selectedRange = range;
+                });
+              }),
+        )
+      ],
     );
+  }
+
+  List<ClockLabel> _getLabels() {
+    var labels = [
+      "12 am",
+      "3 am",
+      "6 am",
+      "9 am",
+      "12 pm",
+      "3 pm",
+      "6 pm",
+      "9 pm"
+    ];
+    return labels.asMap().entries.map((e) {
+      return ClockLabel.fromIndex(idx: e.key, length: 8, text: e.value);
+    }).toList();
+  }
+
+  bool isToday(DateTime dateTime) {
+    DateTime now = DateTime.now();
+
+    DateTime nowToCompare = DateTime(now.year, now.month, now.day);
+    DateTime dateTimeToCompare = DateTime(
+      dateTime.year,
+      dateTime.month,
+      dateTime.day,
+    );
+    return dateTimeToCompare.difference(nowToCompare).inDays == 0;
   }
 }
