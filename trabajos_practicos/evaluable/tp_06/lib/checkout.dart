@@ -29,17 +29,19 @@ class _CheckoutFormState extends State<_CheckoutForm> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(40.0),
+      padding: const EdgeInsets.only(left: 40.0, right: 40.0, bottom: 40.0),
       child: Form(
         key: _formKey,
-        child: Column(
-          children: <Widget>[
-            OrderDetail(),
-            AddressInformation(),
-            PaymentMethod(),
-            ShipmentMoment(),
-            _buildConfirmButton(),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              OrderDetail(),
+              AddressInformation(),
+              PaymentMethod(),
+              ShipmentMoment(),
+              _buildConfirmButton(),
+            ],
+          ),
         ),
       ),
     );
@@ -81,7 +83,7 @@ class OrderDetail extends StatelessWidget {
             children: [
               ListTile(
                 title: const Text("Subtotal:"),
-                trailing: Text("\$ ${cart.cartTotal()}.00"),
+                trailing: Text("\$ ${cart.cartTotal().toStringAsFixed(2)}"),
               ),
               const ListTile(
                 title: Text("Envio:"),
@@ -89,7 +91,7 @@ class OrderDetail extends StatelessWidget {
               ),
               ListTile(
                 title: const Text("Total:"),
-                trailing: Text("\$ ${cart.cartTotalWithShipping()}.00"),
+                trailing: Text("\$ ${cart.cartTotalWithShipping().toStringAsFixed(2)}"),
               ),
             ],
           ),

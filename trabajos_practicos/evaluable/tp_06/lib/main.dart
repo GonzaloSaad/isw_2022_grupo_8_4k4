@@ -66,6 +66,11 @@ class Grabeat extends StatelessWidget {
           //backgroundColor: Colors.green,
         ),
       ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          primary: Color(0xff63d471),
+        )
+      )
     );
   }
 }
