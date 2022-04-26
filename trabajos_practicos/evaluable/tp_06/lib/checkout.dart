@@ -13,6 +13,9 @@ var _visa_credit_card_cvv_regex = RegExp(r'^\d{3}$');
 var _visa_credit_card_name_regex =
     RegExp(r'^([A-Za-z]+\s)([A-Za-z]+)\s{0,1}([A-Za-z]+){0,1}$');
 
+var _visa_credit_card_expiration_date =
+    RegExp(r"^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$");
+
 class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
@@ -350,7 +353,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _cardDate() {
+    var expirationMask = MaskTextInputFormatter(
+      mask: '##/##',
+      filter: {"#": RegExp(r'[0-9]')},
+    );
     return TextFormField(
+      inputFormatters: [expirationMask],
       decoration: const InputDecoration(
         border: UnderlineInputBorder(),
         labelText: 'Fecha Vencimiento',
@@ -361,14 +369,16 @@ class _PaymentMethodState extends State<PaymentMethod> {
           if (value.isEmpty) {
             return "Ingrese Vencimiento no vacío.";
           }
-          if (DateTime.tryParse(value) == null) {
+
+          if (!_visa_credit_card_expiration_date.hasMatch(value)) {
             return "Ingrese una fecha válida";
           }
-          if (DateTime.tryParse(value) != null) {
-            var expirationDate = DateTime.parse(value);
-            if (DateTime.now().difference(expirationDate).inDays <= 0) {
-              return "La fecha de Vencimiento debe ser en el futuro.";
-            }
+
+          var month = int.parse(value.split("/")[0]);
+          var year = int.parse(value.split("/")[0]);
+          var now = DateTime.now();
+          if (now.year >= year && now.month >= month) {
+            return "La fecha de Vencimiento debe ser en el futuro.";
           }
         }
         return null;
@@ -377,7 +387,12 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _cardCVV() {
+    var cvvMask = MaskTextInputFormatter(
+      mask: '###',
+      filter: {"#": RegExp(r'[0-9]')},
+    );
     return TextFormField(
+      inputFormatters: [cvvMask],
       decoration: const InputDecoration(
         border: UnderlineInputBorder(),
         labelText: 'CVV',
