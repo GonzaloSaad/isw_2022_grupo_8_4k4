@@ -274,67 +274,91 @@ class _PaymentMethodState extends State<PaymentMethod> {
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         children: [
-          TextFormField(
-          decoration: const InputDecoration(
-          border: UnderlineInputBorder(),
-          labelText: 'Numero de La tarjeta',
-          ),
-          keyboardType: TextInputType.number,
-          validator: (value) {
-            if (value != null) {
-              if (value.isEmpty) {
-                return "Ingrese un monto no vacío.";
-              }
-            }
-          } ,
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Titular de la tarjeta',
-            ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value != null) {
-                if (value.isEmpty) {
-                  return "Ingrese Nombre Valido.";
-                }
-              }
-            } ,
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'Fecha Vencimiento',
-            ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value != null) {
-                if (value.isEmpty) {
-                  return "Ingrese Vencimiento Valido.";
-                }
-              }
-            } ,
-          ),
-          TextFormField(
-            decoration: const InputDecoration(
-              border: UnderlineInputBorder(),
-              labelText: 'CVV',
-            ),
-            keyboardType: TextInputType.number,
-            validator: (value) {
-              if (value != null) {
-                if (value.isEmpty) {
-                  return "Ingrese CVV Valido.";
-                }
-              }
-            } ,
-          ),
+          _cardNumber(),
+          _cardName(),
+          Row(children:[
+            Container(
+              width: MediaQuery.of(context).size.width*0.4, child: _cardDate(),),
+            SizedBox(width: 15),
+            Container(
+              width: MediaQuery.of(context).size.width*0.4, child: _cardCVV(),)
+          ]),
+
+
         ],
       )
 
     );
   }
+
+  Widget _cardNumber (){
+    return TextFormField(
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'Numero de La tarjeta',
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese un monto no vacío.";
+          }
+        }
+      } ,
+    );
+  }
+
+  Widget _cardName (){
+    return TextFormField(
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'Titular de la tarjeta',
+      ),
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese Nombre Valido.";
+          }
+        }
+      } ,
+    );
+  }
+
+  Widget _cardDate (){
+    return TextFormField(
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'Fecha Vencimiento',
+      ),
+      keyboardType: TextInputType.datetime,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese Vencimiento Valido.";
+          }
+        }
+      } ,
+    );
+  }
+
+  Widget _cardCVV () {
+    return TextFormField(
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'CVV',
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese CVV Valido.";
+          }
+        }
+      } ,
+    );
+  }
+
 
   Widget _buildCashInput() {
     return TextFormField(
