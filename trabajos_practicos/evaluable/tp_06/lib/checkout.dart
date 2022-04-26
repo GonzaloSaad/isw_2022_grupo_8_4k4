@@ -2,11 +2,16 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:time_range_picker/time_range_picker.dart';
-import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'cartmodel.dart';
+
+var _visa_credit_card_number_regex = RegExp(r'^4\d{15}$');
+var _visa_credit_card_cvv_regex = RegExp(r'^\d{3}$');
+var _visa_credit_card_name_regex =
+    RegExp(r'^([A-Za-z]+\s)([A-Za-z]+)\s{0,1}([A-Za-z]+){0,1}$');
 
 class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
@@ -56,7 +61,8 @@ class _CheckoutFormState extends State<_CheckoutForm> {
           if (_formKey.currentState!.validate()) {
             CartModel cart = ScopedModel.of<CartModel>(context);
             cart.clearCart();
-            Navigator.pushReplacementNamed(context, "/home");
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                "/home", (Route<dynamic> route) => false);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Pedido Enviado')),
             );
@@ -92,7 +98,8 @@ class OrderDetail extends StatelessWidget {
               ),
               ListTile(
                 title: const Text("Total:"),
-                trailing: Text("\$ ${cart.cartTotalWithShipping().toStringAsFixed(2)}"),
+                trailing: Text(
+                    "\$ ${cart.cartTotalWithShipping().toStringAsFixed(2)}"),
               ),
             ],
           ),
@@ -271,30 +278,34 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _buildVISAInput() {
-
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Column(
         children: [
           _cardNumber(),
           _cardName(),
-          Row(children:[
-            Container(
-              width: MediaQuery.of(context).size.width*0.4, child: _cardDate(),),
-            SizedBox(width: 15),
-            Container(
-              width: MediaQuery.of(context).size.width*0.4, child: _cardCVV(),)
-          ]),
-
-
+          Row(
+            children: [
+              Expanded(
+                child: _cardDate(),
+                flex: 3,
+              ),
+              Expanded(
+                child: _cardCVV(),
+                flex: 1,
+              )
+            ],
+          ),
         ],
-      )
-
+      ),
     );
   }
 
-  Widget _cardNumber (){
-    var cardMask = MaskTextInputFormatter(mask: '#### - #### - #### - ####', filter: { "#": RegExp(r'[0-9]') });
+  Widget _cardNumber() {
+    var cardMask = MaskTextInputFormatter(
+      mask: '#### - #### - #### - ####',
+      filter: {"#": RegExp(r'[0-9]')},
+    );
     return TextFormField(
       inputFormatters: [cardMask],
       decoration: const InputDecoration(
@@ -305,14 +316,19 @@ class _PaymentMethodState extends State<PaymentMethod> {
       validator: (value) {
         if (value != null) {
           if (value.isEmpty) {
-            return "Ingrese un monto no vacío.";
+            return "Ingrese un número de tarjeta no vacío.";
+          }
+          var cardNumber = value.replaceAll("-", "").replaceAll(" ", "");
+          if (!_visa_credit_card_number_regex.hasMatch(cardNumber)) {
+            return "Ingrese un número de tarjeta VISA válido.";
           }
         }
-      } ,
+        return null;
+      },
     );
   }
 
-  Widget _cardName (){
+  Widget _cardName() {
     return TextFormField(
       decoration: const InputDecoration(
         border: UnderlineInputBorder(),
@@ -322,14 +338,18 @@ class _PaymentMethodState extends State<PaymentMethod> {
       validator: (value) {
         if (value != null) {
           if (value.isEmpty) {
-            return "Ingrese Nombre Valido.";
+            return "Ingrese Nombre no vacío.";
+          }
+          if (!_visa_credit_card_name_regex.hasMatch(value)) {
+            return "Ingrese un Nombre válido.";
           }
         }
-      } ,
+        return null;
+      },
     );
   }
 
-  Widget _cardDate (){
+  Widget _cardDate() {
     return TextFormField(
       decoration: const InputDecoration(
         border: UnderlineInputBorder(),
@@ -339,14 +359,24 @@ class _PaymentMethodState extends State<PaymentMethod> {
       validator: (value) {
         if (value != null) {
           if (value.isEmpty) {
-            return "Ingrese Vencimiento Valido.";
+            return "Ingrese Vencimiento no vacío.";
+          }
+          if (DateTime.tryParse(value) == null) {
+            return "Ingrese una fecha válida";
+          }
+          if (DateTime.tryParse(value) != null) {
+            var expirationDate = DateTime.parse(value);
+            if (DateTime.now().difference(expirationDate).inDays <= 0) {
+              return "La fecha de Vencimiento debe ser en el futuro.";
+            }
           }
         }
-      } ,
+        return null;
+      },
     );
   }
 
-  Widget _cardCVV () {
+  Widget _cardCVV() {
     return TextFormField(
       decoration: const InputDecoration(
         border: UnderlineInputBorder(),
@@ -356,13 +386,16 @@ class _PaymentMethodState extends State<PaymentMethod> {
       validator: (value) {
         if (value != null) {
           if (value.isEmpty) {
-            return "Ingrese CVV Valido.";
+            return "Ingrese CVV no vacío.";
+          }
+          if (!_visa_credit_card_cvv_regex.hasMatch(value)) {
+            return "Ingrese CVV válido.";
           }
         }
-      } ,
+        return null;
+      },
     );
   }
-
 
   Widget _buildCashInput() {
     return TextFormField(
