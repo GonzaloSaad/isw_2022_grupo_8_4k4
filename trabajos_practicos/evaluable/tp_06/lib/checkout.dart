@@ -2,10 +2,19 @@ import 'package:currency_text_input_formatter/currency_text_input_formatter.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 
 import 'cartmodel.dart';
+
+var _visa_credit_card_number_regex = RegExp(r'^4\d{15}$');
+var _visa_credit_card_cvv_regex = RegExp(r'^\d{3}$');
+var _visa_credit_card_name_regex =
+    RegExp(r'^([A-Za-z]+\s)([A-Za-z]+)\s{0,1}([A-Za-z]+){0,1}$');
+
+var _visa_credit_card_expiration_date =
+    RegExp(r"^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$");
 
 class CheckoutPage extends StatelessWidget {
   Widget build(BuildContext context) {
@@ -55,7 +64,8 @@ class _CheckoutFormState extends State<_CheckoutForm> {
           if (_formKey.currentState!.validate()) {
             CartModel cart = ScopedModel.of<CartModel>(context);
             cart.clearCart();
-            Navigator.pushReplacementNamed(context, "/home");
+            Navigator.of(context).pushNamedAndRemoveUntil(
+                "/home", (Route<dynamic> route) => false);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Pedido Enviado')),
             );
@@ -91,7 +101,8 @@ class OrderDetail extends StatelessWidget {
               ),
               ListTile(
                 title: const Text("Total:"),
-                trailing: Text("\$ ${cart.cartTotalWithShipping().toStringAsFixed(2)}"),
+                trailing: Text(
+                    "\$ ${cart.cartTotalWithShipping().toStringAsFixed(2)}"),
               ),
             ],
           ),
@@ -270,7 +281,135 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _buildVISAInput() {
-    return const Text("VISA");
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(
+        children: [
+          _cardNumber(),
+          _cardName(),
+          Row(
+            children: [
+              Expanded(
+                child: _cardDate(),
+                flex: 3,
+              ),
+              Expanded(
+                child: _cardCVV(),
+                flex: 1,
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _cardNumber() {
+    var cardMask = MaskTextInputFormatter(
+      mask: '#### - #### - #### - ####',
+      filter: {"#": RegExp(r'[0-9]')},
+    );
+    return TextFormField(
+      inputFormatters: [cardMask],
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'Numero de La tarjeta',
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese un número de tarjeta no vacío.";
+          }
+          var cardNumber = value.replaceAll("-", "").replaceAll(" ", "");
+          if (!_visa_credit_card_number_regex.hasMatch(cardNumber)) {
+            return "Ingrese un número de tarjeta VISA válido.";
+          }
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _cardName() {
+    return TextFormField(
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'Titular de la tarjeta',
+      ),
+      keyboardType: TextInputType.text,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese Nombre no vacío.";
+          }
+          if (!_visa_credit_card_name_regex.hasMatch(value)) {
+            return "Ingrese un Nombre válido.";
+          }
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _cardDate() {
+    var expirationMask = MaskTextInputFormatter(
+      mask: '##/##',
+      filter: {"#": RegExp(r'[0-9]')},
+    );
+    return TextFormField(
+      inputFormatters: [expirationMask],
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'Fecha Vencimiento',
+      ),
+      keyboardType: TextInputType.datetime,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese Vencimiento no vacío.";
+          }
+
+          if (!_visa_credit_card_expiration_date.hasMatch(value)) {
+            return "Ingrese una fecha válida";
+          }
+
+          var month = int.parse(value.split("/")[0]);
+          var year = int.parse(value.split("/")[1]) + 2000;
+          var now = DateTime.now();
+          if (now.year > year || now.year == year && now.month >= month) {
+            return "Ingrese una fecha válida.";
+          }
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget _cardCVV() {
+    var cvvMask = MaskTextInputFormatter(
+      mask: '###',
+      filter: {"#": RegExp(r'[0-9]')},
+    );
+    return TextFormField(
+      inputFormatters: [cvvMask],
+      decoration: const InputDecoration(
+        border: UnderlineInputBorder(),
+        labelText: 'CVV',
+      ),
+      keyboardType: TextInputType.number,
+      validator: (value) {
+        if (value != null) {
+          if (value.isEmpty) {
+            return "Ingrese CVV no vacío.";
+          }
+          if (!_visa_credit_card_cvv_regex.hasMatch(value)) {
+            return "Ingrese CVV válido.";
+          }
+        }
+        return null;
+      },
+    );
   }
 
   Widget _buildCashInput() {
