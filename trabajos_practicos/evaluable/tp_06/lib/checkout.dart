@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:time_range_picker/time_range_picker.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import 'cartmodel.dart';
 
@@ -270,6 +271,7 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _buildVISAInput() {
+
     return Padding(
       padding: const EdgeInsets.only(top: 10),
       child: Column(
@@ -292,7 +294,9 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _cardNumber (){
+    var cardMask = MaskTextInputFormatter(mask: '#### - #### - #### - ####', filter: { "#": RegExp(r'[0-9]') });
     return TextFormField(
+      inputFormatters: [cardMask],
       decoration: const InputDecoration(
         border: UnderlineInputBorder(),
         labelText: 'Numero de La tarjeta',
