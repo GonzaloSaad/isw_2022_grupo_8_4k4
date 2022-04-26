@@ -375,10 +375,10 @@ class _PaymentMethodState extends State<PaymentMethod> {
           }
 
           var month = int.parse(value.split("/")[0]);
-          var year = int.parse(value.split("/")[0]);
+          var year = int.parse(value.split("/")[1]) + 2000;
           var now = DateTime.now();
-          if (now.year >= year && now.month >= month) {
-            return "La fecha de Vencimiento debe ser en el futuro.";
+          if (now.year > year || now.year == year && now.month >= month) {
+            return "Ingrese una fecha válida.";
           }
         }
         return null;
