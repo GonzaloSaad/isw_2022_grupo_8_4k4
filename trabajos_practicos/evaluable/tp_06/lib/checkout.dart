@@ -270,7 +270,70 @@ class _PaymentMethodState extends State<PaymentMethod> {
   }
 
   Widget _buildVISAInput() {
-    return const Text("VISA");
+    return Padding(
+      padding: const EdgeInsets.only(top: 10),
+      child: Column(
+        children: [
+          TextFormField(
+          decoration: const InputDecoration(
+          border: UnderlineInputBorder(),
+          labelText: 'Numero de La tarjeta',
+          ),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value != null) {
+              if (value.isEmpty) {
+                return "Ingrese un monto no vacío.";
+              }
+            }
+          } ,
+          ),
+          TextFormField(
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Titular de la tarjeta',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value != null) {
+                if (value.isEmpty) {
+                  return "Ingrese Nombre Valido.";
+                }
+              }
+            } ,
+          ),
+          TextFormField(
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'Fecha Vencimiento',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value != null) {
+                if (value.isEmpty) {
+                  return "Ingrese Vencimiento Valido.";
+                }
+              }
+            } ,
+          ),
+          TextFormField(
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              labelText: 'CVV',
+            ),
+            keyboardType: TextInputType.number,
+            validator: (value) {
+              if (value != null) {
+                if (value.isEmpty) {
+                  return "Ingrese CVV Valido.";
+                }
+              }
+            } ,
+          ),
+        ],
+      )
+
+    );
   }
 
   Widget _buildCashInput() {
